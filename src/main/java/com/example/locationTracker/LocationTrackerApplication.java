@@ -1,13 +1,13 @@
-package com.mudit.locationtracker;
+package com.example.locationTracker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LocationtrackerApplication {
+public class LocationTrackerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LocationtrackerApplication.class, args);
+		SpringApplication.run(LocationTrackerApplication.class, args);
 	}
 
 }
