@@ -50,6 +50,28 @@ public class FeatureService {
         return savedFeature;
     }
 
+    @Transactional
+    public EntryFeature requestEntryFeature(String trackerPhone, String trackeePhone, AreaEntity area) {
+        UserEntity tracker = userRepository.findById(trackerPhone)
+                .orElseThrow(() -> new EntityNotFoundException("Tracker not found: " + trackerPhone));
+        UserEntity trackee = userRepository.findById(trackeePhone)
+                .orElseThrow(() -> new EntityNotFoundException("Trackee not found: " + trackeePhone));
+
+        EntryFeature feature = new EntryFeature(tracker, trackee, area);
+        return featureRepository.save(feature);
+    }
+
+    @Transactional
+    public ExitFeature requestExitFeature(String trackerPhone, String trackeePhone, AreaEntity area) {
+        UserEntity tracker = userRepository.findById(trackerPhone)
+                .orElseThrow(() -> new EntityNotFoundException("Tracker not found: " + trackerPhone));
+        UserEntity trackee = userRepository.findById(trackeePhone)
+                .orElseThrow(() -> new EntityNotFoundException("Trackee not found: " + trackeePhone));
+
+        ExitFeature feature = new ExitFeature(tracker, trackee, area);
+        return featureRepository.save(feature);
+    }
+
     /**
      * Trackee approves a pending feature.
      */
@@ -115,6 +137,8 @@ public class FeatureService {
             feature.onLocationUpdate(trackee); // Polymorphic call
         }
     }
+
+
 
     // =============================
     //      FEATURE -> DTO MAPPER

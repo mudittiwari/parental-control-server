@@ -30,4 +30,6 @@ public abstract class Feature {
 
     // All features must implement their core logic
     public abstract void onLocationUpdate(UserEntity trackee);
+
+    public abstract String getFeatureType();
 }

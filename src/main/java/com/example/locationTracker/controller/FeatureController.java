@@ -37,6 +37,43 @@ public class FeatureController {
         );
     }
 
+    @PostMapping("/request-entry")
+    public FeatureDTO requestEntry(@RequestBody EntryExitFeatureRequest request) {
+        AreaEntity area = AreaEntity.builder()
+                .centerLocation(new com.example.locationTracker.location.LocationEntity(
+                        null, String.valueOf(request.getLat()), String.valueOf(request.getLon())))
+                .radiusInKm(request.getRadiusKm())
+                .build();
+
+        return featureService.toDTO(
+                featureService.requestEntryFeature(
+                        request.getTrackerPhone(),
+                        request.getTrackeePhone(),
+                        area
+                )
+        );
+    }
+
+    /**
+     * Request creation of an Exit feature.
+     */
+    @PostMapping("/request-exit")
+    public FeatureDTO requestExit(@RequestBody EntryExitFeatureRequest request) {
+        AreaEntity area = AreaEntity.builder()
+                .centerLocation(new com.example.locationTracker.location.LocationEntity(
+                        null, String.valueOf(request.getLat()), String.valueOf(request.getLon())))
+                .radiusInKm(request.getRadiusKm())
+                .build();
+
+        return featureService.toDTO(
+                featureService.requestExitFeature(
+                        request.getTrackerPhone(),
+                        request.getTrackeePhone(),
+                        area
+                )
+        );
+    }
+
     /**
      * Trackee approves a pending feature.
      */

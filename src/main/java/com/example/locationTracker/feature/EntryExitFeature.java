@@ -27,6 +27,11 @@ public class EntryExitFeature extends Feature {
     }
 
     @Override
+    public String getFeatureType() {
+        return "EntryExit";
+    }
+
+    @Override
     public void onLocationUpdate(UserEntity trackee) {
         if (getStatus() != FeatureStatus.APPROVED) return;
         if (trackee.getLocation() == null) return;
