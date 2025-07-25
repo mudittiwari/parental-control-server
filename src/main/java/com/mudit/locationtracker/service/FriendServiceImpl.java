@@ -1,12 +1,27 @@
 package com.mudit.locationtracker.service;
 
+import com.mudit.locationtracker.dto.UserDTO;
+import com.mudit.locationtracker.model.UserEntity;
+import com.mudit.locationtracker.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class FriendServiceImpl implements FriendService{
-    public List<String> getFriendsOf(String userId) {
-        return List.of("device123", "friend2", "friend3"); // Replace with DB fetch
+@RequiredArgsConstructor
+public class FriendServiceImpl implements FriendService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    public List<UserDTO> getFriendsOf(String userPhone) {
+        UserEntity user = userRepository.fetchWithFriends(userPhone)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getFriends().stream()
+                .map(UserDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }

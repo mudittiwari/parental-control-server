@@ -1,4 +1,5 @@
 package com.mudit.locationtracker.controller;
+import com.mudit.locationtracker.dto.UserDTO;
 import com.mudit.locationtracker.model.LocationData;
 import com.mudit.locationtracker.model.NotificationData;
 import com.mudit.locationtracker.service.FriendService;
@@ -27,10 +28,11 @@ public class LocationController {
     public LocationData handleLocation(LocationData location) {
         System.out.println("Received: " + location.getSenderId() + " -> " + location.getReceiverId());
 
-        List<String> friends = friendService.getFriendsOf(location.getSenderId());
+        List<UserDTO> friends = friendService.getFriendsOf(location.getSenderId());
 
-        for (int i = 0; i < friends.size(); i++) {
-            String friendId = friends.get(i);
+        for (UserDTO friend : friends) {
+            String friendId = friend.getPhoneNumber(); // ✅ FIXED: use .getPhoneNumber()
+
             int delaySeconds = 10;
             CompletableFuture.delayedExecutor(delaySeconds, TimeUnit.SECONDS)
                     .execute(() -> {
