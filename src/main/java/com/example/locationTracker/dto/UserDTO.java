@@ -1,6 +1,7 @@
-package com.example.locationTracker.user;
+package com.example.locationTracker.dto;
 
 import com.example.locationTracker.location.LocationEntity;
+import com.example.locationTracker.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

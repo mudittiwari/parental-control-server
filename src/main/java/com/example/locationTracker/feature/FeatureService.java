@@ -1,6 +1,8 @@
 package com.example.locationTracker.feature;
 
 import com.example.locationTracker.area.AreaEntity;
+import com.example.locationTracker.dto.FeatureDTO;
+import com.example.locationTracker.dto.FeatureScheduleDTO;
 import com.example.locationTracker.repository.FeatureRepository;
 import com.example.locationTracker.repository.UserRepository;
 import com.example.locationTracker.user.UserEntity;
@@ -10,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +30,7 @@ public class FeatureService {
      * Initially saved with PENDING status (trackee must approve).
      */
     @Transactional
-    public EntryExitFeature requestEntryExitFeature(String trackerPhone, String trackeePhone, AreaEntity area) {
+    public EntryExitFeature requestEntryExitFeature(String name, String trackerPhone, String trackeePhone, AreaEntity area, List<FeatureScheduleDTO> scheduleDTOs) {
         log.info("Requesting Entry-Exit Feature: tracker={}, trackee={}, area={}",
                 trackerPhone, trackeePhone, area);
 
@@ -42,7 +46,9 @@ public class FeatureService {
                     return new EntityNotFoundException("Trackee not found: " + trackeePhone);
                 });
 
-        EntryExitFeature feature = new EntryExitFeature(tracker, trackee, area);
+        EntryExitFeature feature = new EntryExitFeature(name, tracker, trackee, area, new ArrayList<>());
+        List<FeatureSchedule> schedules = mapSchedules(scheduleDTOs, feature);
+        feature.setSchedules(schedules);
         EntryExitFeature savedFeature = featureRepository.save(feature);
 
         log.info("Entry-Exit Feature created successfully: featureId={}, tracker={}, trackee={}",
@@ -51,24 +57,27 @@ public class FeatureService {
     }
 
     @Transactional
-    public EntryFeature requestEntryFeature(String trackerPhone, String trackeePhone, AreaEntity area) {
+    public EntryFeature requestEntryFeature(String name, String trackerPhone, String trackeePhone, AreaEntity area, List<FeatureScheduleDTO> scheduleDTOs) {
         UserEntity tracker = userRepository.findById(trackerPhone)
                 .orElseThrow(() -> new EntityNotFoundException("Tracker not found: " + trackerPhone));
         UserEntity trackee = userRepository.findById(trackeePhone)
                 .orElseThrow(() -> new EntityNotFoundException("Trackee not found: " + trackeePhone));
 
-        EntryFeature feature = new EntryFeature(tracker, trackee, area);
+        EntryFeature feature = new EntryFeature(name, tracker, trackee, area, new ArrayList<>());
+        List<FeatureSchedule> schedules = mapSchedules(scheduleDTOs, feature);
+        feature.setSchedules(schedules);
         return featureRepository.save(feature);
     }
 
-    @Transactional
-    public ExitFeature requestExitFeature(String trackerPhone, String trackeePhone, AreaEntity area) {
+    public ExitFeature requestExitFeature(String name, String trackerPhone, String trackeePhone, AreaEntity area, List<FeatureScheduleDTO> scheduleDTOs) {
         UserEntity tracker = userRepository.findById(trackerPhone)
                 .orElseThrow(() -> new EntityNotFoundException("Tracker not found: " + trackerPhone));
         UserEntity trackee = userRepository.findById(trackeePhone)
                 .orElseThrow(() -> new EntityNotFoundException("Trackee not found: " + trackeePhone));
 
-        ExitFeature feature = new ExitFeature(tracker, trackee, area);
+        ExitFeature feature = new ExitFeature(name, tracker, trackee, area, scheduleDTOs);
+        List<FeatureSchedule> schedules = mapSchedules(scheduleDTOs, feature);
+        feature.setSchedules(schedules);
         return featureRepository.save(feature);
     }
 
@@ -81,7 +90,7 @@ public class FeatureService {
 
         Feature feature = featureRepository.findById(featureId)
                 .orElseThrow(() -> {
-                    log.error("Feature not found: {}", featureId);
+                    log.error("Feature not found for accepting: {}", featureId);
                     return new EntityNotFoundException("Feature not found with ID: " + featureId);
                 });
 
@@ -96,6 +105,29 @@ public class FeatureService {
 
         log.info("Feature approved successfully: featureId={}", featureId);
         return updatedFeature;
+    }
+
+    @Transactional
+    public Feature rejectFeature(Long featureId, String trackeePhone) {
+        log.info("Rejecting feature: featureId={}, trackee={}", featureId, trackeePhone);
+
+        Feature feature = featureRepository.findById(featureId)
+                .orElseThrow(() -> {
+                    log.error("Feature not found for rejecting: {}", featureId);
+                    return new EntityNotFoundException("Feature not found with ID: " + featureId);
+                });
+
+        if (!feature.getTrackee().getPhoneNumber().equals(trackeePhone)) {
+            log.warn("Rejection failed: Trackee mismatch (expected={}, got={})",
+                    feature.getTrackee().getPhoneNumber(), trackeePhone);
+            throw new IllegalArgumentException("Only the trackee can reject this feature.");
+        }
+
+        feature.setStatus(FeatureStatus.REJECTED);
+        Feature rejectedFeature = featureRepository.save(feature);
+
+        log.info("Feature rejected successfully: featureId={}", featureId);
+        return rejectedFeature;
     }
 
     /**
@@ -138,7 +170,13 @@ public class FeatureService {
         }
     }
 
-
+    public List<FeatureDTO> getFeaturesBetween(String trackerPhone, String trackeePhone) {
+        return featureRepository
+                .findByTrackerPhoneNumberAndTrackeePhoneNumberAndStatus(trackerPhone, trackeePhone, FeatureStatus.APPROVED)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
 
     // =============================
     //      FEATURE -> DTO MAPPER
@@ -147,7 +185,21 @@ public class FeatureService {
         AreaEntity area = null;
         if (feature instanceof EntryExitFeature entryExitFeature) {
             area = entryExitFeature.getArea();
+        } else if (feature instanceof EntryFeature entryFeature) {
+            area = entryFeature.getArea();
+        } else if (feature instanceof ExitFeature exitFeature) {
+            area = exitFeature.getArea();
         }
+
+        List<FeatureScheduleDTO> scheduleDTOs = feature.getSchedules() != null
+                ? feature.getSchedules().stream().map(sch -> FeatureScheduleDTO.builder()
+                        .startTime(sch.getStartTime())
+                        .endTime(sch.getEndTime())
+                        .activeDays(sch.getActiveDays())
+                        .activeDates(sch.getActiveDates())
+                        .build())
+                .collect(Collectors.toList())
+                : null;
 
         return FeatureDTO.builder()
                 .id(feature.getId())
@@ -155,7 +207,21 @@ public class FeatureService {
                 .trackeePhone(feature.getTrackee().getPhoneNumber())
                 .status(feature.getStatus())
                 .area(area)
+                .name(feature.getName())
+                .schedules(scheduleDTOs)
                 .build();
+    }
+
+    private List<FeatureSchedule> mapSchedules(List<FeatureScheduleDTO> dtos, Feature feature) {
+        if (dtos == null) return new ArrayList<>();
+        return dtos.stream().map(dto -> FeatureSchedule.builder()
+                .startTime(dto.getStartTime())
+                .endTime(dto.getEndTime())
+                .activeDays(dto.getActiveDays())
+                .activeDates(dto.getActiveDates())
+                .feature(feature)
+                .build()
+        ).collect(Collectors.toList());
     }
 
     public List<FeatureDTO> toDTOList(List<Feature> features) {

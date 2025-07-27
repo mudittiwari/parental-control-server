@@ -1,5 +1,6 @@
 package com.example.locationTracker.user;
 
+import com.example.locationTracker.dto.UserDTO;
 import com.example.locationTracker.feature.FeatureService;
 import com.example.locationTracker.location.LocationEntity;
 import com.example.locationTracker.repository.UserRepository;
@@ -37,10 +38,14 @@ public class UserService {
         return UserDTO.fromEntity(saved);
     }
 
-    public boolean loginUser(String phoneNumber, String rawPassword) {
+    public UserDTO loginUser(String phoneNumber, String rawPassword) {
         UserEntity user = userRepository.findById(phoneNumber)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return passwordEncoder.matches(rawPassword, user.getPassword());
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        return UserDTO.fromEntity(user);
     }
 
     public UserDTO getUser(String phoneNumber) {
@@ -51,7 +56,6 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream().map(UserDTO::fromEntity).collect(Collectors.toList());
     }
-
 
     public UserDTO createUser(String phoneNumber, String name, String email, double lat, double lon) {
         log.info("Creating user: phone={}, name={}, email={}, lat={}, lon={}",
@@ -87,6 +91,11 @@ public class UserService {
         featureService.onTrackeeLocationUpdate(updatedUser);
 
         return UserDTO.fromEntity(updatedUser);
+    }
+
+    public List<UserDTO> findUsersByPhoneNumbers(List<String> phoneNumbers) {
+        List<UserEntity> users = userRepository.findAllByPhoneNumberIn(phoneNumbers);
+        return users.stream().map(UserDTO::fromEntity).toList();
     }
 
     @Transactional

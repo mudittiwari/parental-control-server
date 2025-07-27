@@ -1,6 +1,7 @@
 package com.example.locationTracker.controller;
 
-import com.example.locationTracker.user.UserDTO;
+import com.example.locationTracker.user.PhoneNumberListRequest;
+import com.example.locationTracker.dto.UserDTO;
 import com.example.locationTracker.user.UserEntity;
 import com.example.locationTracker.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,10 @@ public class UserController {
 
         public double getLon() { return lon; }
         public void setLon(double lon) { this.lon = lon; }
+    }
+
+    @PostMapping("/lookup")
+    public List<UserDTO> lookupUsers(@RequestBody PhoneNumberListRequest request) {
+        return userService.findUsersByPhoneNumbers(request.getPhoneNumbers());
     }
 }

@@ -1,6 +1,6 @@
 package com.example.locationTracker.auth;
 
-import com.example.locationTracker.user.UserDTO;
+import com.example.locationTracker.dto.UserDTO;
 import com.example.locationTracker.user.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +26,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-        boolean success = userService.loginUser(request.getPhoneNumber(), request.getPassword());
-        return success ? "Login successful" : "Invalid phone number or password";
+    public UserDTO login(@RequestBody LoginRequest request) {
+        return userService.loginUser(request.getPhoneNumber(), request.getPassword());
     }
 
     @Data

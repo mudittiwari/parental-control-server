@@ -1,10 +1,13 @@
 package com.example.locationTracker.feature;
 
 import com.example.locationTracker.area.AreaEntity;
+import com.example.locationTracker.dto.FeatureScheduleDTO;
 import com.example.locationTracker.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Entity
 @Table(name = "entry_exit_features")
@@ -21,8 +24,8 @@ public class EntryExitFeature extends Feature {
 
     private boolean inside = false;
 
-    public EntryExitFeature(UserEntity tracker, UserEntity trackee, AreaEntity area) {
-        super(null, tracker, trackee, FeatureStatus.PENDING);
+    public EntryExitFeature(String name, UserEntity tracker, UserEntity trackee, AreaEntity area, List<FeatureSchedule> schedules) {
+        super(null, tracker, name, trackee, FeatureStatus.PENDING, schedules);
         this.area = area;
     }
 
