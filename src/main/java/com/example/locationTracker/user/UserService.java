@@ -24,7 +24,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserDTO registerUser(String phoneNumber, String name, String email, String password, double lat, double lon, String pKey) {
-        log.info("Registering user: phone={}, name={}, email={}", phoneNumber, name, email);
+        log.info("Registering user: phone={}, name={}, email={}, pKey={}", phoneNumber, name, email, pKey);
 
         UserEntity user = UserEntity.builder()
                 .phoneNumber(phoneNumber)
@@ -58,15 +58,16 @@ public class UserService {
         return userRepository.findAll().stream().map(UserDTO::fromEntity).collect(Collectors.toList());
     }
 
-    public UserDTO createUser(String phoneNumber, String name, String email, double lat, double lon) {
-        log.info("Creating user: phone={}, name={}, email={}, lat={}, lon={}",
-                phoneNumber, name, email, lat, lon);
+    public UserDTO createUser(String phoneNumber, String name, String email, double lat, double lon, String pKey) {
+        log.info("Creating user: phone={}, name={}, email={}, lat={}, lon={}, pKey={}",
+                phoneNumber, name, email, lat, lon, pKey);
 
         UserEntity user = UserEntity.builder()
                 .phoneNumber(phoneNumber)
                 .name(name)
                 .email(email)
                 .location(new LocationEntity(null, String.valueOf(lat), String.valueOf(lon)))
+                .pKey(pKey)
                 .build();
 
         UserDTO savedUser = UserDTO.fromEntity(userRepository.save(user));

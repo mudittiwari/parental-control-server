@@ -23,7 +23,8 @@ public class UserController {
                 userRequest.getName(),
                 userRequest.getEmail(),
                 Double.parseDouble(userRequest.getLocation().getLatitude()),
-                Double.parseDouble(userRequest.getLocation().getLongitude())
+                Double.parseDouble(userRequest.getLocation().getLongitude()),
+                userRequest.getPKey()
         );
     }
 

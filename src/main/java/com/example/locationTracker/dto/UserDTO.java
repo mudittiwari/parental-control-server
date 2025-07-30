@@ -20,6 +20,7 @@ public class UserDTO {
     private String email;
     private LocationEntity location;
     private List<String> friends;
+    private String pKey;
 
     public static UserDTO fromEntity(UserEntity user) {
         return UserDTO.builder()
@@ -33,6 +34,7 @@ public class UserDTO {
                                 .map(UserEntity::getPhoneNumber)
                                 .collect(Collectors.toList())
                 )
+                .pKey(user.getPKey())
                 .build();
     }
 }
