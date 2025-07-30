@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -25,7 +26,10 @@ public class FeatureSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Start time must not be null")
     private LocalTime startTime;
+
+    @NotNull(message = "End time must not be null")
     private LocalTime endTime;
 
     @ElementCollection
@@ -41,4 +45,10 @@ public class FeatureSchedule {
     @ManyToOne
     @JoinColumn(name = "feature_id")
     private Feature feature;
+
+    @AssertTrue(message = "Either activeDays or activeDates must be provided")
+    public boolean isValidScheduleWindow() {
+        return (activeDays != null && !activeDays.isEmpty())
+                || (activeDates != null && !activeDates.isEmpty());
+    }
 }

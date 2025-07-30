@@ -5,6 +5,7 @@ import com.example.locationTracker.dto.FeatureDTO;
 import com.example.locationTracker.dto.FeatureScheduleDTO;
 import com.example.locationTracker.dto.MutualFeatureRequest;
 import com.example.locationTracker.feature.FeatureService;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class FeatureController {
      * Request Entry-Exit Feature
      */
     @PostMapping("/request-entry-exit")
-    public FeatureDTO requestEntryExit(@RequestBody FeatureRequest request) {
+    public FeatureDTO requestEntryExit(@RequestBody @Valid FeatureRequest request) {
         AreaEntity area = buildArea(request);
         return featureService.toDTO(
                 featureService.requestEntryExitFeature(
@@ -42,7 +43,7 @@ public class FeatureController {
      * Request Entry Feature
      */
     @PostMapping("/request-entry")
-    public FeatureDTO requestEntry(@RequestBody FeatureRequest request) {
+    public FeatureDTO requestEntry(@RequestBody @Valid FeatureRequest request) {
         AreaEntity area = buildArea(request);
         return featureService.toDTO(
                 featureService.requestEntryFeature(
@@ -59,7 +60,7 @@ public class FeatureController {
      * Request Exit Feature
      */
     @PostMapping("/request-exit")
-    public FeatureDTO requestExit(@RequestBody FeatureRequest request) {
+    public FeatureDTO requestExit(@RequestBody @Valid FeatureRequest request) {
         AreaEntity area = buildArea(request);
         return featureService.toDTO(
                 featureService.requestExitFeature(

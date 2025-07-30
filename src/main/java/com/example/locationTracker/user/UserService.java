@@ -23,7 +23,7 @@ public class UserService {
     private final FeatureService featureService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDTO registerUser(String phoneNumber, String name, String email, String password, double lat, double lon) {
+    public UserDTO registerUser(String phoneNumber, String name, String email, String password, double lat, double lon, String pKey) {
         log.info("Registering user: phone={}, name={}, email={}", phoneNumber, name, email);
 
         UserEntity user = UserEntity.builder()
@@ -32,6 +32,7 @@ public class UserService {
                 .email(email)
                 .password(passwordEncoder.encode(password)) // HASHING PASSWORD
                 .location(new LocationEntity(null, String.valueOf(lat), String.valueOf(lon)))
+                .pKey(pKey)
                 .build();
 
         UserEntity saved = userRepository.save(user);

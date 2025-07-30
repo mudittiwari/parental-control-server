@@ -21,7 +21,8 @@ public class AuthController {
                 request.getEmail(),
                 request.getPassword(),
                 request.getLat(),
-                request.getLon()
+                request.getLon(),
+                request.getPKey()
         );
     }
 
@@ -38,6 +39,7 @@ public class AuthController {
         private String password;
         private double lat;
         private double lon;
+        private String pKey;
     }
 
     @Data

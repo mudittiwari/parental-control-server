@@ -2,6 +2,7 @@ package com.example.locationTracker.feature;
 
 import com.example.locationTracker.user.UserEntity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.time.DayOfWeek;
@@ -36,6 +37,7 @@ public abstract class Feature {
     @Enumerated(EnumType.STRING)
     private FeatureStatus status = FeatureStatus.PENDING;
 
+    @Valid
     @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FeatureSchedule> schedules = new ArrayList<>();
 
