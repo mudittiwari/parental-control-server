@@ -121,6 +121,8 @@ public class FeatureController {
     public Map<String, List<FeatureDTO>> getMutualFeatures(@RequestBody MutualFeatureRequest request) {
         List<FeatureDTO> user1ToUser2 = featureService.getFeaturesBetween(request.getUser1(), request.getUser2());
         List<FeatureDTO> user2ToUser1 = featureService.getFeaturesBetween(request.getUser2(), request.getUser1());
+        // System.out.println(user1ToUser2);
+        // System.out.println(user2ToUser1);
 
         return Map.of(
                 request.getUser1() + "_on_" + request.getUser2(), user1ToUser2,

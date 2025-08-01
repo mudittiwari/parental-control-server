@@ -24,7 +24,7 @@ public class UserEntity {
     private String name;
     private String email;
 
-    @Column(name = "p_key")
+    @Column(name = "p_key", length = 2048)
     private String pKey;
 
     @Column(nullable = false)

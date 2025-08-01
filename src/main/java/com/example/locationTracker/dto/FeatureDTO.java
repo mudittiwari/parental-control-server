@@ -18,6 +18,7 @@ public class FeatureDTO {
     private String name;
     private String trackerPhone;
     private String trackeePhone;
+    private String type;
     private AreaEntity area;
     private FeatureStatus status;
     private List<FeatureScheduleDTO> schedules;
