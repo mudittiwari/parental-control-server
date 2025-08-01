@@ -7,6 +7,15 @@ public class LocationData {
     private double latitude;
     private double longitude;
     private long timestamp;
+    private String payload;
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
 
     public String getSenderId() {
         return senderId;

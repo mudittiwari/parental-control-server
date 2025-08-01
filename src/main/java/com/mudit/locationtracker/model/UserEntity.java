@@ -18,10 +18,12 @@ public class UserEntity {
 
     @Id
     @Column(name = "phone_number", nullable = false, unique = true)
-    private String phoneNumber;   // Primary Key
+    private String phoneNumber;
 
     private String name;
     private String email;
+    @Column(name = "p_key", length = 2048)
+    private String pKey;
 
     @Column(nullable = false)
     private String password;

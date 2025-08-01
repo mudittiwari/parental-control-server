@@ -1,4 +1,5 @@
 package com.mudit.locationtracker.controller;
+
 import com.mudit.locationtracker.dto.UserDTO;
 import com.mudit.locationtracker.model.LocationData;
 import com.mudit.locationtracker.model.NotificationData;
@@ -19,33 +20,34 @@ public class LocationController {
     private FriendService friendService;
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    public LocationController(SimpMessagingTemplate simpMessagingTemplate){
+    public LocationController(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @MessageMapping("/send-location")
-    @SendTo("/topic/location")
     public LocationData handleLocation(LocationData location) {
-        System.out.println("Received: " + location.getSenderId() + " -> " + location.getReceiverId());
+        System.out.println("📥 Received location from: " + location.getSenderId() +
+                " -> to: " + location.getReceiverId());
 
-        List<UserDTO> friends = friendService.getFriendsOf(location.getSenderId());
+        String receiverId = location.getReceiverId();
 
-        for (UserDTO friend : friends) {
-            String friendId = friend.getPhoneNumber(); // ✅ FIXED: use .getPhoneNumber()
+        // Schedule the message to be sent after a short delay (e.g., 10 seconds)
+        int delaySeconds = 5;
+        CompletableFuture.delayedExecutor(delaySeconds, TimeUnit.SECONDS)
+                .execute(() -> {
+                    NotificationData notif = new NotificationData();
+                    notif.setUserId(location.getSenderId());
+                    notif.setTitle("📍 Location Update");
+                    notif.setMessage("You received a new location from " + location.getSenderId());
+                    notif.setPayload(location.getPayload());
 
-            int delaySeconds = 10;
-            CompletableFuture.delayedExecutor(delaySeconds, TimeUnit.SECONDS)
-                    .execute(() -> {
-                        NotificationData notif = new NotificationData();
-                        notif.setUserId(friendId);
-                        notif.setTitle("Location Update");
-                        notif.setMessage("Your friend " + location.getSenderId() + " updated their location.");
+                    simpMessagingTemplate.convertAndSend(
+                            "/topic/notifications/" + receiverId, notif);
 
-                        simpMessagingTemplate.convertAndSend("/topic/notifications/" + friendId, notif);
-                        System.out.println("Sent delayed notification to: " + friendId);
-                    });
-        }
-        return location;
+                    System.out.println("📤 Sent location to receiver: " + receiverId);
+                });
+
+        return location; // optional: only needed if you still want to return something to sender
     }
 
 }

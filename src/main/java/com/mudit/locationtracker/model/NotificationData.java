@@ -4,12 +4,20 @@ public class NotificationData {
     private String title;
     private String message;
     private String userId;
+    private String payload;
 
 
-    public NotificationData(String title, String message, String userId){
+    public String getPayload() {
+        return payload;
+    }
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
+    public NotificationData(String title, String message, String userId, String payload){
         this.title = title;
         this.message = message;
         this.userId = userId;
+        this.payload = payload;
     }
     public NotificationData(){
 
@@ -38,4 +46,5 @@ public class NotificationData {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+    
 }

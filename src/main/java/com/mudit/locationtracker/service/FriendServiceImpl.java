@@ -17,10 +17,16 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserDTO> getFriendsOf(String userPhone) {
-        UserEntity user = userRepository.fetchWithFriends(userPhone)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // UserEntity user = userRepository.fetchWithFriends(userPhone)
+        // .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user.getFriends().stream()
+        // return user.getFriends().stream()
+        // .map(UserDTO::fromEntity)
+        // .collect(Collectors.toList());
+
+        List<UserEntity> users = userRepository.fetchAllUsers();
+
+        return users.stream()
                 .map(UserDTO::fromEntity)
                 .collect(Collectors.toList());
     }
