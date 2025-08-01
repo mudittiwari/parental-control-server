@@ -160,4 +160,11 @@ public class FeatureController {
     public static class ApproveFeatureRequest {
         private String trackeePhone;
     }
+
+    @DeleteMapping("/{featureId}")
+    public String deleteFeature(@PathVariable Long featureId,
+                                @RequestParam String trackerPhone) {
+        featureService.deleteFeature(featureId, trackerPhone);
+        return "Feature deleted successfully.";
+    }
 }

@@ -209,6 +209,7 @@ public class FeatureService {
                 .area(area)
                 .name(feature.getName())
                 .schedules(scheduleDTOs)
+                .type(feature.getFeatureType())
                 .build();
     }
 
@@ -226,5 +227,19 @@ public class FeatureService {
 
     public List<FeatureDTO> toDTOList(List<Feature> features) {
         return features.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteFeature(Long featureId, String requesterPhone) {
+        Feature feature = featureRepository.findById(featureId)
+                .orElseThrow(() -> new EntityNotFoundException("Feature not found with ID: " + featureId));
+
+        // Optional: Check if the requester is authorized
+        if (!feature.getTracker().getPhoneNumber().equals(requesterPhone)) {
+            throw new IllegalArgumentException("Only the tracker who created the feature can delete it.");
+        }
+
+        featureRepository.delete(feature);
+        log.info("Feature deleted successfully: featureId={}, by={}", featureId, requesterPhone);
     }
 }

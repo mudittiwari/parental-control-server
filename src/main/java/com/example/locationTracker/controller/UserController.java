@@ -66,4 +66,21 @@ public class UserController {
     public List<UserDTO> lookupUsers(@RequestBody PhoneNumberListRequest request) {
         return userService.findUsersByPhoneNumbers(request.getPhoneNumbers());
     }
+
+    @PatchMapping("/{phoneNumber}/pkey")
+    public UserDTO updatePKey(@PathVariable String phoneNumber, @RequestBody PKeyRequest request) {
+        return userService.updatePKey(phoneNumber, request.getPkey());
+    }
+
+    public static class PKeyRequest {
+        private String pkey;
+
+        public String getPkey() {
+            return pkey;
+        }
+
+        public void setPkey(String pkey) {
+            this.pkey = pkey;
+        }
+    }
 }

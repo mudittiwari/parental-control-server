@@ -122,4 +122,12 @@ public class UserService {
         userRepository.save(friend);
         log.info("Friendship saved between {} and {}", userPhone, friendPhone);
     }
+
+    @Transactional
+    public UserDTO updatePKey(String phoneNumber, String pKey) {
+        UserEntity user = userRepository.findById(phoneNumber)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        user.setPKey(pKey);
+        return UserDTO.fromEntity(userRepository.save(user));
+    }
 }
