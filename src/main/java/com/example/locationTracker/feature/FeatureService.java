@@ -234,8 +234,7 @@ public class FeatureService {
         Feature feature = featureRepository.findById(featureId)
                 .orElseThrow(() -> new EntityNotFoundException("Feature not found with ID: " + featureId));
 
-        // Optional: Check if the requester is authorized
-        if (!feature.getTracker().getPhoneNumber().equals(requesterPhone)) {
+        if (!feature.getTracker().getPhoneNumber().trim().equals(requesterPhone.trim())) {
             throw new IllegalArgumentException("Only the tracker who created the feature can delete it.");
         }
 
