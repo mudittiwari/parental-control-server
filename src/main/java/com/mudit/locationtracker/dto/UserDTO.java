@@ -15,6 +15,8 @@ public class UserDTO {
     private String phoneNumber;
     private String name;
     private String email;
+    private String pKey;
+    private String token;
 
     private List<String> friendPhones;
 
@@ -27,6 +29,8 @@ public class UserDTO {
                         .stream()
                         .map(UserEntity::getPhoneNumber)
                         .collect(Collectors.toList()))
+                .token(user.getToken())
+                .pKey(user.getPKey())
                 .build();
     }
 }

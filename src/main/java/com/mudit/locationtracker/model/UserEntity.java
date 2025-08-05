@@ -28,6 +28,8 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    private String token;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", unique = true)
     private LocationEntity location;
