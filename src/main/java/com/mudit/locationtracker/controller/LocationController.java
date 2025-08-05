@@ -1,8 +1,10 @@
 package com.mudit.locationtracker.controller;
 
 import com.mudit.locationtracker.dto.UserDTO;
+import com.mudit.locationtracker.dto.notification.NotificationRequest;
 import com.mudit.locationtracker.model.LocationData;
 import com.mudit.locationtracker.model.NotificationData;
+import com.mudit.locationtracker.service.FirebaseService;
 import com.mudit.locationtracker.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -10,7 +12,10 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Controller
@@ -18,7 +23,11 @@ public class LocationController {
 
     @Autowired
     private FriendService friendService;
+
+    @Autowired
+    private FirebaseService firebaseService;
     private SimpMessagingTemplate simpMessagingTemplate;
+    public static final Map<String, String> phoneToSessionMap = new ConcurrentHashMap<>();
 
     public LocationController(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
@@ -26,6 +35,11 @@ public class LocationController {
 
     @MessageMapping("/send-location")
     public LocationData handleLocation(LocationData location) {
+        try {
+            firebaseService.sendMessageToToken(new NotificationRequest("test", "test", "test", "ccaVv1bFR1mjnjsykSiWrl:APA91bEECScooaAX6gri0zgwQricAhp_d82RTOzfnS1V_gMg_4171dw994RrKUopzwWIIzN1Jj4UUhzWVrGqRypzvq_DJEEHav7oyX02bhD88CTKiE7ows0"));
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
         System.out.println("📥 Received location from: " + location.getSenderId() +
                 " -> to: " + location.getReceiverId());
 
@@ -49,5 +63,8 @@ public class LocationController {
 
         return location; // optional: only needed if you still want to return something to sender
     }
+
+    
+
 
 }
