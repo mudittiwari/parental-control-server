@@ -34,12 +34,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public UserDTO login(@RequestBody LoginRequest request) {
-        return userService.loginUser(request.getPhoneNumber(), request.getPassword());
+        return userService.loginUser(request.getPhoneNumber(), request.getPassword(), request.getToken());
     }
 
     @Data
     public static class LoginRequest {
         private String phoneNumber;
         private String password;
+        private String token;
     }
 }

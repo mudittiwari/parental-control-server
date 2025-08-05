@@ -27,6 +27,8 @@ public class UserEntity {
     @Column(name = "p_key", length = 2048)
     private String pKey;
 
+    private String token;
+
     @Column(nullable = false)
     private String password;
 

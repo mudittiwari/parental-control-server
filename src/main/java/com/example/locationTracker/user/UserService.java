@@ -33,19 +33,20 @@ public class UserService {
                 .password(passwordEncoder.encode(password)) // HASHING PASSWORD
                 .location(new LocationEntity(null, String.valueOf(lat), String.valueOf(lon)))
                 .pKey(pKey)
+                .token("")
                 .build();
 
         UserEntity saved = userRepository.save(user);
         return UserDTO.fromEntity(saved);
     }
 
-    public UserDTO loginUser(String phoneNumber, String rawPassword) {
+    public UserDTO loginUser(String phoneNumber, String rawPassword, String token) {
         UserEntity user = userRepository.findById(phoneNumber)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
-
+        user.setToken(token);
         return UserDTO.fromEntity(user);
     }
 
@@ -68,6 +69,7 @@ public class UserService {
                 .email(email)
                 .location(new LocationEntity(null, String.valueOf(lat), String.valueOf(lon)))
                 .pKey(pKey)
+                .token("")
                 .build();
 
         UserDTO savedUser = UserDTO.fromEntity(userRepository.save(user));

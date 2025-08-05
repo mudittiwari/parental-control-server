@@ -21,6 +21,7 @@ public class UserDTO {
     private LocationEntity location;
     private List<String> friends;
     private String pKey;
+    private String token;
 
     public static UserDTO fromEntity(UserEntity user) {
         return UserDTO.builder()
@@ -35,6 +36,7 @@ public class UserDTO {
                                 .collect(Collectors.toList())
                 )
                 .pKey(user.getPKey())
+                .token(user.getToken())
                 .build();
     }
 }
