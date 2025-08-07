@@ -23,7 +23,8 @@ public class UserService {
     private final FeatureService featureService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDTO registerUser(String phoneNumber, String name, String email, String password, double lat, double lon, String pKey) {
+    public UserDTO registerUser(String phoneNumber, String name, String email, String password, double lat, double lon,
+            String pKey) {
         log.info("Registering user: phone={}, name={}, email={}, pKey={}", phoneNumber, name, email, pKey);
 
         UserEntity user = UserEntity.builder()
@@ -40,6 +41,8 @@ public class UserService {
         return UserDTO.fromEntity(saved);
     }
 
+
+    @Transactional
     public UserDTO loginUser(String phoneNumber, String rawPassword, String token) {
         UserEntity user = userRepository.findById(phoneNumber)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -47,6 +50,7 @@ public class UserService {
             throw new IllegalArgumentException("Invalid password");
         }
         user.setToken(token);
+        userRepository.save(user);
         return UserDTO.fromEntity(user);
     }
 
